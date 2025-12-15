@@ -55,7 +55,8 @@
               ],
               "outputHashing": "all",
               "optimization": true,
-              "sourceMap": false
+              "sourceMap": false,
+              "baseHref": "/python_szkolenie/"
             },
             "development": {
               "optimization": false,
