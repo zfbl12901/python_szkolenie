@@ -1,5 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Inject, Optional } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { APP_BASE_HREF } from '@angular/common';
 import { Observable, of, forkJoin } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 
@@ -29,9 +30,38 @@ export interface Article {
 })
 export class ContentService {
   private http = inject(HttpClient);
-  private contentBasePath = '/assets/content';
+  private baseHref: string;
+  private contentBasePath: string;
   private articlesCache: Article[] | null = null;
   private currentSection: string = 'Python'; // Section par défaut
+
+  constructor(@Optional() @Inject(APP_BASE_HREF) baseHref?: string) {
+    // Utiliser le baseHref fourni ou le récupérer depuis le document
+    if (baseHref) {
+      // baseHref est déjà fourni par Angular (ex: "/python_szkolenie/")
+      this.baseHref = baseHref;
+    } else {
+      // Récupérer depuis le base tag
+      const baseElement = document.querySelector('base');
+      if (baseElement && baseElement.href) {
+        // Extraire le pathname de l'URL complète
+        try {
+          const url = new URL(baseElement.href, window.location.origin);
+          this.baseHref = url.pathname;
+        } catch {
+          this.baseHref = baseElement.getAttribute('href') || '/';
+        }
+      } else {
+        this.baseHref = '/';
+      }
+    }
+    // Normaliser le baseHref (s'assurer qu'il se termine par / sauf si c'est juste '/')
+    if (this.baseHref !== '/' && !this.baseHref.endsWith('/')) {
+      this.baseHref += '/';
+    }
+    // Construire le chemin complet vers les assets (sans double slash)
+    this.contentBasePath = `${this.baseHref}assets/content`.replace(/([^:]\/)\/+/g, '$1');
+  }
 
   // Liste de tous les fichiers markdown (sans ceux dans old/)
   // Les fichiers sont maintenant dans des sous-dossiers (ex: Python/)
