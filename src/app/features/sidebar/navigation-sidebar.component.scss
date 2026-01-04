@@ -1,0 +1,150 @@
+.navigation-sidebar {
+  width: 280px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 64px);
+  position: fixed;
+  top: 64px;
+  left: 0;
+  transition: transform 0.3s ease, width 0.3s ease;
+  z-index: 1000;
+
+  &.collapsed {
+    width: 60px;
+  }
+}
+
+.dark-theme .navigation-sidebar {
+  background: linear-gradient(180deg, #0f1624 0%, #141b2d 100%);
+  border-right-color: rgba(96, 165, 250, 0.1);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  gap: 0.75rem;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.sidebar-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.sidebar-nav {
+  padding: 1rem 0;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0;
+  
+  &.level-0 {
+    padding-left: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  
+  &.level-1 {
+    padding-left: 1.5rem;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+  }
+  
+  &.level-2 {
+    padding-left: 2rem;
+    font-weight: 400;
+    font-size: 0.75rem;
+    margin-top: 0.2rem;
+  }
+  
+  &.level-3 {
+    padding-left: 2.5rem;
+    font-weight: 400;
+    font-size: 0.7rem;
+    margin-top: 0.15rem;
+  }
+  
+  &.level-4,
+  &.level-5,
+  &.level-6 {
+    padding-left: 2.5rem;
+    font-weight: 400;
+    font-size: 0.7rem;
+    margin-top: 0.15rem;
+  }
+}
+
+.nav-link {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+  position: relative;
+
+  &:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    border-left-color: var(--accent-color);
+    padding-left: 1.75rem;
+  }
+
+  .nav-item.active & {
+    color: var(--accent-color);
+    background: linear-gradient(90deg, transparent 0%, var(--bg-secondary) 100%);
+    border-left-color: var(--accent-color);
+    font-weight: 500;
+  }
+}
+
+.nav-title {
+  display: block;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.5;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.nav-sublist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

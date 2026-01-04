@@ -29,8 +29,55 @@ export class SectionService {
       icon: '🐍',
       color: '#3776ab',
       path: 'Python'
+    },
+    {
+      id: 'angular',
+      name: 'Angular',
+      description: 'Formation sur le framework Angular pour le développement web',
+      icon: '🅰️',
+      color: '#dd0031',
+      path: 'Angular'
+    },
+    {
+      id: 'go',
+      name: 'Go',
+      description: 'Formation sur le langage de programmation Go (Golang)',
+      icon: '🐹',
+      color: '#00add8',
+      path: 'Go'
+    },
+    {
+      id: 'rust',
+      name: 'Rust',
+      description: 'Formation sur le langage de programmation Rust',
+      icon: '🦀',
+      color: '#ce422b',
+      path: 'Rust'
+    },
+    {
+      id: 'java',
+      name: 'Java',
+      description: 'Formation sur le langage de programmation Java',
+      icon: '☕',
+      color: '#ed8b00',
+      path: 'Java'
+    },
+    {
+      id: 'veille-technos',
+      name: 'Veille Technos',
+      description: 'Articles de veille technologique et actualités du développement',
+      icon: '📰',
+      color: '#ff6b6b',
+      path: 'veille_technos'
+    },
+    {
+      id: 'obsidian',
+      name: 'Obsidian',
+      description: 'Notes, ressources et documentation Obsidian',
+      icon: '🔮',
+      color: '#4834d4',
+      path: 'Obsidian'
     }
-    // Ajoutez d'autres sections ici au fur et à mesure
   ];
 
   getSections(): Observable<Section[]> {

@@ -7,55 +7,64 @@ import { switchMap, map } from 'rxjs/operators';
 import { MarkdownService } from '../../core/services/markdown.service';
 import { SuggestionsService, Suggestion } from '../../core/services/suggestions.service';
 import { ExportService } from '../../core/services/export.service';
+import { NavigationSidebarComponent } from '../sidebar/navigation-sidebar.component';
+import { TableOfContentsSidebarComponent } from '../sidebar/table-of-contents-sidebar.component';
 import { OfflineService } from '../../core/services/offline.service';
 
 @Component({
   selector: 'app-article',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NavigationSidebarComponent, TableOfContentsSidebarComponent],
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="article-container" [class.focus-mode]="isFocusMode" *ngIf="article$ | async as article">
-      <div class="article-toolbar" *ngIf="!isFocusMode">
-        <div class="toolbar-left">
-          <a routerLink="/" class="back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            Retour
-          </a>
-        </div>
-        <div class="toolbar-right">
-          <button class="toolbar-button" (click)="toggleFocusMode()" title="Mode Focus (F)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <line x1="9" y1="3" x2="9" y2="21"/>
-            </svg>
-          </button>
-          <button class="toolbar-button" (click)="exportPDF()" title="Exporter en PDF">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-          </button>
-          <button class="toolbar-button" (click)="exportMarkdown()" title="Exporter en Markdown">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="article-header">
-        <h1 class="article-title">{{ article.title }}</h1>
-        <div class="article-meta" *ngIf="article.category">
-          <span class="article-category">{{ article.category }}</span>
-        </div>
-      </div>
+      <!-- Sidebar gauche - Navigation -->
+      <app-navigation-sidebar [collapsed]="leftSidebarCollapsed"></app-navigation-sidebar>
       
-      <div class="article-content" #articleContent [innerHTML]="markdownContent$ | async"></div>
+      <!-- Sidebar droite - Table des matières -->
+      <app-table-of-contents-sidebar [collapsed]="rightSidebarCollapsed"></app-table-of-contents-sidebar>
+      
+      <div class="article-wrapper" [class.left-collapsed]="leftSidebarCollapsed" [class.right-collapsed]="rightSidebarCollapsed">
+        <div class="article-toolbar" *ngIf="!isFocusMode">
+          <div class="toolbar-left">
+            <a routerLink="/" class="back-link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Retour
+            </a>
+          </div>
+          <div class="toolbar-right">
+            <button class="toolbar-button" (click)="toggleFocusMode()" title="Mode Focus (F)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <line x1="9" y1="3" x2="9" y2="21"/>
+              </svg>
+            </button>
+            <button class="toolbar-button" (click)="exportPDF()" title="Exporter en PDF">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </button>
+            <button class="toolbar-button" (click)="exportMarkdown()" title="Exporter en Markdown">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="article-header">
+          <h1 class="article-title">{{ article.title }}</h1>
+          <div class="article-meta" *ngIf="article.category">
+            <span class="article-category">{{ article.category }}</span>
+          </div>
+        </div>
+        
+        <div class="article-content markdown-content" #articleContent [innerHTML]="markdownContent$ | async"></div>
 
       <!-- Suggestions -->
       <ng-container *ngIf="!isFocusMode">
@@ -103,6 +112,8 @@ export class ArticleComponent implements OnInit, AfterViewChecked {
   suggestions$!: Observable<Suggestion[]>;
   isFocusMode = false;
   currentArticleSlug = '';
+  leftSidebarCollapsed = false;
+  rightSidebarCollapsed = false;
   private lastContent = '';
 
   ngOnInit() {

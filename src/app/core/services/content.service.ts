@@ -34,6 +34,7 @@ export class ContentService {
   private contentBasePath: string;
   private articlesCache: Article[] | null = null;
   private currentSection: string = 'Python'; // Section par défaut
+  private pythonFilesCache: string[] | null = null; // Cache pour les fichiers Python
 
   constructor(@Optional() @Inject(APP_BASE_HREF) baseHref?: string) {
     // Utiliser le baseHref fourni ou le récupérer depuis le document
@@ -63,78 +64,127 @@ export class ContentService {
     this.contentBasePath = `${this.baseHref}assets/content`.replace(/([^:]\/)\/+/g, '$1');
   }
 
-  // Liste de tous les fichiers markdown (sans ceux dans old/)
-  // Les fichiers sont maintenant dans des sous-dossiers (ex: Python/)
-  private readonly markdownFiles = [
-    '01-introduction.md',
-    '02-variables-et-types.md',
-    '03-structures-de-controle.md',
-    '04-fonctions.md',
-    '05-ia-qdrant-introduction.md',
-    '06-embeddings.md',
-    '07-prompt-engineering.md',
-    '08-classes-et-objets.md',
-    '09-modules-et-packages.md',
-    '10-gestion-des-erreurs.md',
-    '11-fichiers-et-io.md',
-    '12-exercices-bases.md',
-    '20-ia-introduction.md',
-    '21-01-openai-api.md',
-    '21-02-anthropic-claude.md',
-    '21-03-langchain.md',
-    '21-04-llm-locaux.md',
-    '21-llm-exploitation.md',
-    '22-01-sentence-transformers.md',
-    '22-02-openai-embeddings.md',
-    '22-03-huggingface-embeddings.md',
-    '22-embeddings.md',
-    '23-01-installation-et-configuration.md',
-    '23-02-collections-et-vecteurs.md',
-    '23-03-recherche-par-similarite.md',
-    '23-04-filtres-et-metadonnees.md',
-    '23-qdrant.md',
-    '24-01-techniques-avancees.md',
-    '24-02-few-shot-learning.md',
-    '24-03-chain-of-thought.md',
-    '24-prompt-engineering.md',
-    '25-01-architecture-rag.md',
-    '25-02-implementation-rag.md',
-    '25-rag.md',
-    '26-exercices-ia.md',
-    '30-01-api-rest-fastapi.md',
-    '30-02-applications-web-flask.md',
-    '30-03-applications-desktop.md',
-    '30-applications-python.md',
-    '31-01-kivy.md',
-    '31-02-beeware.md',
-    '31-03-react-native-python.md',
-    '31-applications-mobiles.md',
-    '32-01-pygame-introduction.md',
-    '32-02-mecaniques-de-jeu.md',
-    '32-03-gestion-des-sprites.md',
-    '32-04-arcade-framework.md',
-    '32-jeux-2d.md',
-    '33-exercices-applications.md',
-    '40-01-docker.md',
-    '40-02-ci-cd.md',
-    '40-03-deploiement-cloud.md',
-    '40-04-monitoring-et-logs.md',
-    '40-devops-python.md',
-    '41-01-pytest.md',
-    '41-02-tests-unitaires.md',
-    '41-03-tests-d-integration.md',
-    '41-tests.md',
-    '42-01-profiling.md',
-    '42-02-optimisation-memoire.md',
-    '42-03-asyncio-et-concurrence.md',
-    '42-performance.md',
-    '43-exercices-devops.md',
-    '50-01-chatbot-ia.md',
-    '50-02-api-rag-complete.md',
-    '50-03-jeu-2d-complet.md',
-    '50-projets-pratiques.md',
-    '51-exercices-avances.md'
-  ];
+  /**
+   * Retourne le chemin de base selon la section
+   */
+  private getBasePathForSection(section: string): string {
+    // Toutes les sections utilisent maintenant /assets/content/
+    return `${this.baseHref}assets/content`.replace(/([^:]\/)\/+/g, '$1');
+  }
+
+  /**
+   * Charge la liste des fichiers Python depuis le fichier index
+   */
+  private loadPythonFilesIndex(): Observable<string[]> {
+    if (this.pythonFilesCache) {
+      return of(this.pythonFilesCache);
+    }
+    
+    const indexPath = `${this.getBasePathForSection('Python')}/Python/files-index.json`;
+    return this.http.get<string[]>(indexPath).pipe(
+      map(files => {
+        this.pythonFilesCache = files;
+        return files;
+      }),
+      catchError(() => {
+        console.warn('Impossible de charger files-index.json, utilisation de la liste par défaut');
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * Retourne la liste des fichiers markdown selon la section
+   */
+  private getMarkdownFilesForSection(section: string): Observable<string[]> {
+    // Pour Python, charger depuis le fichier index
+    if (section === 'Python') {
+      return this.loadPythonFilesIndex();
+    }
+    
+    // Pour les autres sections, utiliser la liste statique
+    const filesBySection: { [key: string]: string[] } = {
+      'veille_technos': [
+        'README.md',
+        'exemple-article.md'
+        // Ajoutez vos fichiers de veille technologique ici
+      ],
+      'Angular': [
+        // Ajoutez vos fichiers Angular ici
+      ],
+      'Go': [
+        // Ajoutez vos fichiers Go ici
+      ],
+      'Rust': [
+        // Ajoutez vos fichiers Rust ici
+      ],
+      'Java': [
+        '01-introduction.md',
+        '10-java8.md',
+        '10-01-lambda-expressions.md',
+        '10-02-streams-api.md',
+        '10-03-optional.md',
+        '10-04-default-methods.md',
+        '10-05-date-time-api.md',
+        '10-06-completable-future.md',
+        '11-java11.md',
+        '11-01-var-keyword.md',
+        '11-02-string-methods.md',
+        '11-03-http-client.md',
+        '17-java17.md',
+        '17-01-sealed-classes.md',
+        '17-02-pattern-matching.md',
+        '17-03-records.md',
+        '17-04-text-blocks.md',
+        '21-java21.md',
+        '21-01-virtual-threads.md',
+        '21-02-pattern-matching-enhanced.md',
+        '21-03-string-templates.md',
+        '21-04-sequenced-collections.md',
+        '25-java25.md',
+        '30-redis.md',
+        '31-ehcache.md',
+        '32-caffeine.md',
+        '40-resilience4j.md',
+        '50-spring.md',
+        '51-spring-boot.md',
+        '60-opentelemetry.md',
+        '70-jvm.md',
+        '71-tomcat.md',
+        '72-apache.md',
+        '80-swagger.md',
+        '81-openapi.md'
+      ],
+      'Obsidian': [
+        '00-Inbox.md',
+        '10-Tech-Radar.md',
+        '20-TEMPLATE-Projet.md',
+        '21-01-CLI-Java-SQL.md',
+        '21-02-CVE-Aggregator.md',
+        '21-03-Java-LLM-API-Bridge.md',
+        '21-04-Chatbot-RP-IA.md',
+        '22-_TEMPLATE-Mini-System.md',
+        '23-01-BitTorrent-Simple.md',
+        '23-02-Chat-Temps-Reel.md',
+        '23-03-Docker-Mini.md',
+        '23-04-HTTP-Server.md',
+        '23-05-Redis-Like.md',
+        '23-06-SQL-Simple.md',
+        '30-Java.md',
+        '36-Go.md',
+        '38-Rust.md',
+        '40-TEMPLATE-Veille.md',
+        '50-DevSecOps.md',
+        '60-Polonais.md',
+        '70-Roadmap-2026.md',
+        '80-Career.md'
+      ]
+    };
+    
+    // Retourner un Observable pour toutes les sections
+    const files = filesBySection[section] || [];
+    return of(files);
+  }
 
   private parseFrontmatter(content: string): ArticleMetadata | null {
     const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
@@ -213,11 +263,62 @@ export class ContentService {
 
   private getCategoryFromSortKey(sortKey: string): string {
     const num = this.sortKeyToNumber(sortKey);
-    if (num >= 1 && num < 2000) return 'Bases Python';
-    if (num >= 2000 && num < 3000) return 'Intelligence Artificielle';
-    if (num >= 3000 && num < 4000) return 'Applications';
-    if (num >= 4000 && num < 5000) return 'DevOps et Production';
-    if (num >= 5000) return 'Projets Pratiques';
+    
+    // Catégories spécifiques selon la section
+    if (this.currentSection === 'Python') {
+      if (num >= 1 && num < 2000) return 'Bases Python';
+      if (num >= 2000 && num < 3000) return 'Intelligence Artificielle';
+      if (num >= 3000 && num < 4000) return 'Applications';
+      if (num >= 4000 && num < 5000) return 'DevOps et Production';
+      if (num >= 5000) return 'Projets Pratiques';
+      return 'Autres';
+    } else if (this.currentSection === 'Angular') {
+      if (num >= 1 && num < 1000) return 'Bases Angular';
+      if (num >= 1000 && num < 2000) return 'Composants et Templates';
+      if (num >= 2000 && num < 3000) return 'Services et Injection';
+      if (num >= 3000 && num < 4000) return 'Routing et Navigation';
+      if (num >= 4000 && num < 5000) return 'HTTP et API';
+      if (num >= 5000) return 'Projets Pratiques';
+      return 'Autres';
+    } else if (this.currentSection === 'Go') {
+      if (num >= 1 && num < 1000) return 'Bases Go';
+      if (num >= 1000 && num < 2000) return 'Concurrence';
+      if (num >= 2000 && num < 3000) return 'Interfaces et Types';
+      if (num >= 3000 && num < 4000) return 'Packages et Modules';
+      if (num >= 4000 && num < 5000) return 'Outils et Bonnes Pratiques';
+      if (num >= 5000) return 'Projets Pratiques';
+      return 'Autres';
+    } else if (this.currentSection === 'Rust') {
+      if (num >= 1 && num < 1000) return 'Bases Rust';
+      if (num >= 1000 && num < 2000) return 'Ownership et Borrowing';
+      if (num >= 2000 && num < 3000) return 'Structs et Enums';
+      if (num >= 3000 && num < 4000) return 'Patterns et Traits';
+      if (num >= 4000 && num < 5000) return 'Concurrence';
+      if (num >= 5000) return 'Projets Pratiques';
+      return 'Autres';
+    } else if (this.currentSection === 'Java') {
+      if (num >= 1 && num < 1000) return 'Bases Java';
+      if (num >= 1000 && num < 2000) return 'POO et Classes';
+      if (num >= 2000 && num < 3000) return 'Collections et Streams';
+      if (num >= 3000 && num < 4000) return 'Concurrence';
+      if (num >= 4000 && num < 5000) return 'Frameworks';
+      if (num >= 5000) return 'Projets Pratiques';
+      return 'Autres';
+    } else if (this.currentSection === 'Obsidian') {
+      if (num >= 0 && num < 10) return 'Organisation';
+      if (num >= 10 && num < 20) return 'Tech Radar';
+      if (num >= 20 && num < 30) return 'Templates';
+      if (num >= 30 && num < 40) return 'Langages';
+      if (num >= 40 && num < 50) return 'Veille';
+      if (num >= 50 && num < 60) return 'DevSecOps';
+      if (num >= 60 && num < 70) return 'Langues';
+      if (num >= 70 && num < 80) return 'Roadmap';
+      if (num >= 80) return 'Carrière';
+      return 'Autres';
+    } else if (this.currentSection === 'veille_technos') {
+      return 'Veille Technologique';
+    }
+    
     return 'Autres';
   }
 
@@ -227,7 +328,7 @@ export class ContentService {
   }
 
   private loadArticleMetadata(path: string): Observable<Article> {
-    // Ajouter le chemin de la section si nécessaire
+    // Toutes les sections sont maintenant dans content/, construire le chemin complet
     const fullPath = path.includes('/') ? path : `${this.currentSection}/${path}`;
     
     return this.getArticleContent(fullPath).pipe(
@@ -284,51 +385,65 @@ export class ContentService {
     if (section && section !== this.currentSection) {
       this.currentSection = section;
       this.articlesCache = null;
+      // Invalider aussi le cache des fichiers Python si on change de section
+      if (section !== 'Python') {
+        this.pythonFilesCache = null;
+      }
     }
 
     if (this.articlesCache) {
       return of(this.articlesCache);
     }
 
-    const articleObservables = this.markdownFiles.map(file => 
-      this.loadArticleMetadata(file)
-    );
-    
-    return forkJoin(articleObservables).pipe(
-      map(articles => {
-        // Créer un map pour accéder rapidement aux articles par slug
-        const articlesMap = new Map<string, Article>();
-        articles.forEach(article => {
-          articlesMap.set(article.slug, article);
-        });
+    // Obtenir la liste de fichiers pour la section actuelle (peut être un Observable)
+    return this.getMarkdownFilesForSection(this.currentSection).pipe(
+      switchMap(markdownFiles => {
+        // Si aucune liste de fichiers, retourner un tableau vide
+        if (markdownFiles.length === 0) {
+          return of([]);
+        }
 
-        // Construire la hiérarchie parent/enfant
-        const rootArticles: Article[] = [];
-        articles.forEach(article => {
-          if (article.parentSlug && articlesMap.has(article.parentSlug)) {
-            const parent = articlesMap.get(article.parentSlug)!;
-            parent.children.push(article);
-            article.level = parent.level + 1;
-          } else {
-            article.level = 0;
-            rootArticles.push(article);
-          }
-        });
+        const articleObservables = markdownFiles.map(file => 
+          this.loadArticleMetadata(file)
+        );
+        
+        return forkJoin(articleObservables).pipe(
+          map(articles => {
+            // Créer un map pour accéder rapidement aux articles par slug
+            const articlesMap = new Map<string, Article>();
+            articles.forEach(article => {
+              articlesMap.set(article.slug, article);
+            });
 
-        // Trier les articles par ordre numérique
-        const sortArticles = (articles: Article[]): Article[] => {
-          const sorted = articles.sort((a, b) => a.order - b.order);
-          sorted.forEach(article => {
-            if (article.children.length > 0) {
-              article.children = sortArticles(article.children);
-            }
-          });
-          return sorted;
-        };
+            // Construire la hiérarchie parent/enfant
+            const rootArticles: Article[] = [];
+            articles.forEach(article => {
+              if (article.parentSlug && articlesMap.has(article.parentSlug)) {
+                const parent = articlesMap.get(article.parentSlug)!;
+                parent.children.push(article);
+                article.level = parent.level + 1;
+              } else {
+                article.level = 0;
+                rootArticles.push(article);
+              }
+            });
 
-        const sorted = sortArticles(rootArticles);
-        this.articlesCache = sorted;
-        return sorted;
+            // Trier les articles par ordre numérique
+            const sortArticles = (articles: Article[]): Article[] => {
+              const sorted = articles.sort((a, b) => a.order - b.order);
+              sorted.forEach(article => {
+                if (article.children.length > 0) {
+                  article.children = sortArticles(article.children);
+                }
+              });
+              return sorted;
+            };
+
+            const sorted = sortArticles(rootArticles);
+            this.articlesCache = sorted;
+            return sorted;
+          })
+        );
       })
     );
   }
@@ -363,12 +478,10 @@ export class ContentService {
   getArticleContent(path: string): Observable<string> {
     // Le path peut déjà contenir le chemin complet (ex: Python/01-introduction.md)
     // ou juste le nom du fichier
-    let fullPath: string;
-    if (path.includes('/')) {
-      fullPath = `${this.contentBasePath}/${path}`;
-    } else {
-      fullPath = `${this.contentBasePath}/${this.currentSection}/${path}`;
-    }
+    const basePath = this.getBasePathForSection(this.currentSection);
+    const fullPath = path.includes('/') 
+      ? `${basePath}/${path}` 
+      : `${basePath}/${this.currentSection}/${path}`;
     
     return this.http.get(fullPath, { responseType: 'text' }).pipe(
       catchError(() => {

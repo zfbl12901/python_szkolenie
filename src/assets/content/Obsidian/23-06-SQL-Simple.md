@@ -1,0 +1,5 @@
+Mini base SQL
+
+Scope V1:
+- CREATE TABLE
+- INSERT / SELECT

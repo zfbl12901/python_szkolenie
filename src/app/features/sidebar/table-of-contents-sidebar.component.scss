@@ -1,0 +1,138 @@
+.toc-sidebar {
+  width: 280px;
+  background-color: var(--sidebar-bg);
+  border-left: 1px solid var(--border-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 64px);
+  position: fixed;
+  top: 64px;
+  right: 0;
+  transition: transform 0.3s ease, width 0.3s ease;
+  z-index: 1000;
+  transform: translateX(0);
+
+  &.collapsed {
+    width: 60px;
+    transform: translateX(0);
+  }
+}
+
+.dark-theme .toc-sidebar {
+  background: linear-gradient(180deg, #0f1624 0%, #141b2d 100%);
+  border-left-color: rgba(96, 165, 250, 0.1);
+  box-shadow: -2px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  gap: 0.75rem;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.sidebar-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.toc-nav {
+  padding: 1rem 0;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  margin: 0;
+  
+  &.level-1 {
+    padding-left: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  
+  &.level-2 {
+    padding-left: 1.5rem;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+  }
+  
+  &.level-3 {
+    padding-left: 2rem;
+    font-weight: 400;
+    font-size: 0.75rem;
+    margin-top: 0.2rem;
+  }
+  
+  &.level-4,
+  &.level-5,
+  &.level-6 {
+    padding-left: 2.5rem;
+    font-weight: 400;
+    font-size: 0.7rem;
+    margin-top: 0.15rem;
+  }
+}
+
+.toc-link {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+  position: relative;
+
+  &:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    border-left-color: var(--accent-color);
+    padding-left: 1.75rem;
+  }
+
+  .toc-item.active & {
+    color: var(--accent-color);
+    background: linear-gradient(90deg, transparent 0%, var(--bg-secondary) 100%);
+    border-left-color: var(--accent-color);
+    font-weight: 500;
+  }
+}
+
+.toc-empty {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+}

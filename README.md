@@ -99,6 +99,18 @@ npm run watch
 npm test
 ```
 
+## 📋 Gestion des fichiers Python
+
+La sidebar se met à jour automatiquement en fonction des fichiers présents dans `src/assets/content/Python/`. 
+
+Pour régénérer l'index des fichiers Python après avoir ajouté ou supprimé des fichiers :
+
+```bash
+npm run generate-python-index
+```
+
+Ce script scanne le répertoire `src/assets/content/Python/` et génère un fichier `files-index.json` qui liste tous les fichiers `.md` présents. La sidebar utilise automatiquement ce fichier pour afficher les articles disponibles.
+
 ## 📄 Licence
 
 Ce projet est privé.
